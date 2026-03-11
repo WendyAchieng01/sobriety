@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ancora — Create Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'auth.css' %}"/>
+</head>
+<body class="signup-page">
+
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="auth-layout signup-layout">
+
+    <!-- ── LEFT PANEL ── -->
+    <div class="auth-panel left-panel">
+      <div class="panel-inner">
+
+        <div class="brand">
+          <span class="brand-anchor">⚓</span>
+          <span class="brand-name">Ancora</span>
+        </div>
+
+        <div class="panel-copy">
+          <p class="copy-eyebrow">Begin here</p>
+          <h1 class="copy-heading">Your first day<br/><em>starts now.</em></h1>
+          <p class="copy-body">
+            Ancora means "anchor" in Italian. Let this be the thing
+            that holds you steady when the waves come.
+          </p>
+        </div>
+
+        <div class="journey-steps">
+          <div class="journey-step js-active">
+            <div class="js-dot"></div>
+            <div class="js-content">
+              <span class="js-title">Start your clock</span>
+              <span class="js-desc">Your sobriety timer begins the moment you sign up</span>
+            </div>
+          </div>
+          <div class="js-connector"></div>
+          <div class="journey-step">
+            <div class="js-dot"></div>
+            <div class="js-content">
+              <span class="js-title">Track milestones</span>
+              <span class="js-desc">Celebrate 1 day, 1 week, 1 month and beyond</span>
+            </div>
+          </div>
+          <div class="js-connector"></div>
+          <div class="journey-step">
+            <div class="js-dot"></div>
+            <div class="js-content">
+              <span class="js-title">Build resilience</span>
+              <span class="js-desc">Journal, breathe, surf urges — all in one place</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating-card fc-1">
+          <span class="fc-icon">🌱</span>
+          <div>
+            <span class="fc-title">Day 1 begins</span>
+            <span class="fc-sub">The hardest step</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="auth-panel right-panel">
+      <div class="form-wrap">
+
+        <div class="form-header">
+          <h2 class="form-title">Create Account</h2>
+          <p class="form-sub">Already have one?
+            <a href="{% url 'accounts:login' %}" class="auth-link">Sign in →</a>
+          </p>
+        </div>
+
+        <!-- ── Django Messages ── -->
+        {% if messages %}
+          <div class="django-messages">
+            {% for message in messages %}
+              <div class="django-msg django-msg--{{ message.tags }}">
+                <span class="msg-icon">
+                  {% if 'error' in message.tags %}⚠{% else %}✓{% endif %}
+                </span>
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- ── Step Indicator ── -->
+        <div class="step-indicator">
+          <div class="step-dot active" id="dot-1"></div>
+          <div class="step-line"       id="line-1"></div>
+          <div class="step-dot"        id="dot-2"></div>
+          <div class="step-line"       id="line-2"></div>
+          <div class="step-dot"        id="dot-3"></div>
+        </div>
+        <div class="step-labels">
+          <span class="step-lbl active" id="lbl-1">Account</span>
+          <span class="step-lbl"        id="lbl-2">Profile</span>
+          <span class="step-lbl"        id="lbl-3">Start Date</span>
+        </div>
+
+        <!-- ══════════════════════════════
+             FORM
+             ══════════════════════════════ -->
+        <form class="auth-form" id="signup-form" method="POST" novalidate>
+          {% csrf_token %}
+
+          <!-- ── STEP 1: Account ── -->
+          <div class="form-step active" id="step-1">
+
+            <div class="field-group">
+              <label class="field-label" for="su-email">Email address</label>
+              <div class="field-wrap">
+                <span class="field-icon">✉</span>
+                <input type="email" name="email" id="su-email"
+                       class="field-input"
+                       placeholder="you@example.com"
+                       autocomplete="email"
+                       value="{{ request.POST.email|default:'' }}"/>
+              </div>
+              <span class="field-error" id="su-email-error"></span>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="su-password">Password</label>
+              <div class="field-wrap">
+                <span class="field-icon">◎</span>
+                <input type="password" name="password" id="su-password"
+                       class="field-input"
+                       placeholder="Min. 8 characters"
+                       autocomplete="new-password"/>
+                <button type="button" class="toggle-pw" id="su-toggle-pw"
+                        aria-label="Show password">👁</button>
+              </div>
+              <!-- Password strength bar -->
+              <div class="pw-strength">
+                <div class="pw-bar"><div class="pw-fill" id="pw-fill"></div></div>
+                <span class="pw-label" id="pw-label"></span>
+              </div>
+              <span class="field-error" id="su-password-error"></span>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="su-confirm">Confirm password</label>
+              <div class="field-wrap">
+                <span class="field-icon">◎</span>
+                <input type="password" name="confirm_password" id="su-confirm"
+                       class="field-input"
+                       placeholder="Repeat password"
+                       autocomplete="new-password"/>
+              </div>
+              <span class="field-error" id="su-confirm-error"></span>
+            </div>
+
+            <button type="button" class="btn-auth" id="next-1">
+              <span class="btn-text">Continue</span>
+              <span class="btn-icon">→</span>
+            </button>
+
+          </div><!-- /step-1 -->
+
+          <!-- ── STEP 2: Profile ── -->
+          <div class="form-step" id="step-2">
+
+            <div class="field-group">
+              <label class="field-label" for="su-name">What should we call you?</label>
+              <div class="field-wrap">
+                <span class="field-icon">◈</span>
+                <input type="text" name="name" id="su-name"
+                       class="field-input"
+                       placeholder="Your first name or nickname"
+                       autocomplete="given-name"
+                       value="{{ request.POST.name|default:'' }}"/>
+              </div>
+              <span class="field-error" id="su-name-error"></span>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">What are you recovering from?</label>
+              <div class="recovery-chips" id="recovery-chips">
+                <button type="button" class="chip" data-val="alcohol">Alcohol</button>
+                <button type="button" class="chip" data-val="substances">Substances</button>
+                <button type="button" class="chip" data-val="smoking">Smoking</button>
+                <button type="button" class="chip" data-val="gambling">Gambling</button>
+                <button type="button" class="chip" data-val="other">Other</button>
+                <button type="button" class="chip" data-val="private">Prefer not to say</button>
+              </div>
+              <!-- Hidden input so value is included in POST data -->
+              <input type="hidden" name="recovery_type" id="recovery-input"
+                     value="{{ request.POST.recovery_type|default:'' }}"/>
+              <span class="field-error" id="su-recovery-error"></span>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="su-spend">Avg. daily spending before
+                <span class="field-optional">(optional)</span>
+              </label>
+              <div class="field-wrap">
+                <span class="field-icon">$</span>
+                <input type="number" name="avg_daily_spend" id="su-spend"
+                       class="field-input"
+                       placeholder="0.00" min="0" step="0.01"
+                       value="{{ request.POST.avg_daily_spend|default:'' }}"/>
+              </div>
+            </div>
+
+            <div class="step-nav">
+              <button type="button" class="btn-back" id="back-1">← Back</button>
+              <button type="button" class="btn-auth" id="next-2">
+                <span class="btn-text">Continue</span>
+                <span class="btn-icon">→</span>
+              </button>
+            </div>
+
+          </div><!-- /step-2 -->
+
+          <!-- ── STEP 3: Start Date ── -->
+          <div class="form-step" id="step-3">
+
+            <div class="start-date-panel">
+              <div class="sdp-icon">🌊</div>
+              <h3 class="sdp-title">When did your journey begin?</h3>
+              <p class="sdp-body">
+                We'll start your sobriety clock from this moment.
+                You can always change it later in Settings.
+              </p>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="su-start-date">
+                Sobriety start date &amp; time
+              </label>
+              <div class="field-wrap">
+                <span class="field-icon">◇</span>
+                <input type="datetime-local" name="sobriety_start" id="su-start-date"
+                       class="field-input"
+                       value="{{ request.POST.sobriety_start|default:'' }}"/>
+              </div>
+              <span class="field-error" id="su-date-error"></span>
+            </div>
+
+            <div class="field-group">
+              <label class="checkbox-label agree-label">
+                <input type="checkbox" id="su-agree" class="checkbox-input"/>
+                <span class="checkbox-custom"></span>
+                <span>I agree to the
+                  <a href="#" class="auth-link">Terms</a> and
+                  <a href="#" class="auth-link">Privacy Policy</a>
+                </span>
+              </label>
+              <span class="field-error" id="su-agree-error"></span>
+            </div>
+
+            <div class="step-nav">
+              <button type="button" class="btn-back" id="back-2">← Back</button>
+              <button type="submit" class="btn-auth" id="create-btn">
+                <span class="btn-text">Begin My Journey</span>
+                <span class="btn-icon">⚓</span>
+              </button>
+            </div>
+
+          </div><!-- /step-3 -->
+
+        </form><!-- /signup-form -->
+
+        <div class="divider"><span>or sign up with</span></div>
+        <div class="oauth-row">
+          <button type="button" class="oauth-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Google
+          </button>
+          <button type="button" class="oauth-btn">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M14.045 9.37c-.022-2.017 1.648-2.99 1.722-3.038-0.938-1.372-2.398-1.56-2.917-1.58-1.24-.127-2.43.737-3.061.737-.632 0-1.6-.72-2.635-.7-1.35.02-2.6.79-3.295 2.003-1.41 2.44-.36 6.05 1.014 8.027.672.967 1.47 2.05 2.52 2.012 1.014-.04 1.397-.65 2.625-.65 1.226 0 1.574.65 2.643.63 1.09-.02 1.778-.977 2.443-1.949.775-1.116 1.093-2.2 1.11-2.256-.024-.01-2.13-.815-2.152-3.236z" fill="currentColor"/>
+              <path d="M11.977 3.16c.558-.676.935-1.613.832-2.548-.804.033-1.779.536-2.353 1.212-.516.599-.968 1.558-.847 2.475.896.07 1.81-.456 2.368-1.14z" fill="currentColor"/>
+            </svg>
+            Apple
+          </button>
+        </div>
+
+      </div><!-- /form-wrap -->
+    </div><!-- /right-panel -->
+
+  </div><!-- /auth-layout -->
+
+  <!-- Success overlay — shown briefly before Django redirects -->
+  <div class="success-overlay" id="success-overlay">
+    <div class="success-inner">
+      <div class="success-anchor">⚓</div>
+      <p class="success-msg">You're anchored.</p>
+      <p class="success-sub">Logging you in…</p>
+    </div>
+  </div>
+
+  <script src="{% static 'auth.js' %}"></script>
+</body>
+</html>

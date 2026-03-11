@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ancora — Stay the Course</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'index.css' %}"/>
+</head>
+<body>
+  <!-- Background Canvas -->
+  <canvas id="bg-canvas"></canvas>
+  <!-- Main App Shell -->
+  <div class="app-shell">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="logo">
+        <span class="logo-mark">⚓</span>
+        <span class="logo-text">Ancora</span>
+      </div>
+      <ul class="nav-links">
+        <li class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">◈</span>
+          <span>Dashboard</span>
+        </li>
+        <li class="nav-item" data-page="milestones">
+          <span class="nav-icon">◇</span>
+          <span>Milestones</span>
+        </li>
+        <li class="nav-item" data-page="journal">
+          <span class="nav-icon">◻</span>
+          <span>Journal</span>
+        </li>
+        <li class="nav-item" data-page="breathe">
+          <span class="nav-icon">○</span>
+          <span>Breathe</span>
+        </li>
+        <li class="nav-item" data-page="settings">
+          <span class="nav-icon">◎</span>
+          <span>Settings</span>
+        </li>
+        <!-- Logout -->
+        <li class="nav-item">
+          <form method="POST" action="{% url 'accounts:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">
+              <span class="nav-icon">⎋</span>
+              <span>Logout</span>
+            </button>
+          </form>
+        </li>
+      </ul>
+      <div class="sidebar-quote">
+        <p id="daily-quote">"Every day sober is a day won."</p>
+      </div>
+    </nav>
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- === DASHBOARD PAGE === -->
+      <section class="page active" id="page-dashboard">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Good morning</p>
+            <h1 class="page-title">Your Journey</h1>
+          </div>
+          <div class="header-date" id="today-date"></div>
+        </header>
+        <!-- Hero Counter -->
+        <div class="counter-hero">
+          <div class="counter-ring" id="counter-ring">
+            <svg class="ring-svg" viewBox="0 0 220 220">
+              <circle class="ring-track" cx="110" cy="110" r="95"/>
+              <circle class="ring-progress" id="ring-progress" cx="110" cy="110" r="95"/>
+            </svg>
+            <div class="counter-inner">
+              <span class="counter-number" id="counter-days">0</span>
+              <span class="counter-label">days sober</span>
+            </div>
+          </div>
+          <div class="counter-meta">
+            <div class="meta-stat">
+              <span class="stat-value" id="stat-hours">0</span>
+              <span class="stat-label">hours</span>
+            </div>
+            <div class="meta-divider"></div>
+            <div class="meta-stat">
+              <span class="stat-value" id="stat-minutes">0</span>
+              <span class="stat-label">minutes</span>
+            </div>
+            <div class="meta-divider"></div>
+            <div class="meta-stat">
+              <span class="stat-value" id="stat-seconds">0</span>
+              <span class="stat-label">seconds</span>
+            </div>
+          </div>
+        </div>
+        <!-- Stats Row -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-card-icon">💰</div>
+            <div class="stat-card-body">
+              <span class="stat-card-value" id="money-saved">Kes. 0</span>
+              <span class="stat-card-label">Money Saved</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">❤️</div>
+            <div class="stat-card-body">
+              <span class="stat-card-value" id="health-score">100%</span>
+              <span class="stat-card-label">Health Score</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">🔥</div>
+            <div class="stat-card-body">
+              <span class="stat-card-value" id="streak-count">1</span>
+              <span class="stat-card-label">Day Streak</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-icon">🌿</div>
+            <div class="stat-card-body">
+              <span class="stat-card-value" id="next-milestone">30d</span>
+              <span class="stat-card-label">Next Milestone</span>
+            </div>
+          </div>
+        </div>
+        <!-- Check-in + Mood -->
+        <div class="bottom-row">
+          <div class="card checkin-card">
+            <h3 class="card-title">Today's Check-in</h3>
+            <p class="card-sub">How are you feeling right now?</p>
+            <div class="mood-grid">
+              <button class="mood-btn" data-mood="5" title="Great">😄</button>
+              <button class="mood-btn" data-mood="4" title="Good">🙂</button>
+              <button class="mood-btn" data-mood="3" title="Okay">😐</button>
+              <button class="mood-btn" data-mood="2" title="Tough">😟</button>
+              <button class="mood-btn" data-mood="1" title="Crisis">😰</button>
+            </div>
+            <p class="checkin-status" id="checkin-status">Select your mood above</p>
+          </div>
+          <div class="card urge-card">
+            <h3 class="card-title">Urge Surfing</h3>
+            <p class="card-sub">Feeling an urge? Ride it out.</p>
+            <div class="urge-meter">
+              <label class="urge-label">Urge Intensity</label>
+              <input type="range" class="urge-slider" id="urge-slider" min="1" max="10" value="1"/>
+              <div class="urge-scale">
+                <span>Low</span><span>Moderate</span><span>High</span>
+              </div>
+            </div>
+            <button class="btn-primary" id="start-urge-surf">Start Surfing →</button>
+          </div>
+        </div>
+      </section>
+      <!-- === MILESTONES PAGE === -->
+      <section class="page" id="page-milestones">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Your Progress</p>
+            <h1 class="page-title">Milestones</h1>
+          </div>
+        </header>
+        <div class="milestones-grid" id="milestones-grid">
+          <!-- Injected by JS -->
+        </div>
+      </section>
+      <!-- === JOURNAL PAGE === -->
+      <section class="page" id="page-journal">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Reflect &amp; Release</p>
+            <h1 class="page-title">Journal</h1>
+          </div>
+          <button class="btn-primary" id="new-entry-btn">+ New Entry</button>
+        </header>
+        <div class="journal-layout">
+          <div class="journal-compose card" id="journal-compose" style="display:none;">
+            <input type="text" class="journal-title-input" id="journal-title" placeholder="Entry title…" />
+            <textarea class="journal-body-input" id="journal-body" placeholder="Write freely. No one is watching…" rows="8"></textarea>
+            <div class="journal-actions">
+              <button class="btn-secondary" id="cancel-entry">Cancel</button>
+              <button class="btn-primary" id="save-entry">Save Entry</button>
+            </div>
+          </div>
+          <div class="journal-entries" id="journal-entries">
+            <p class="empty-state">No entries yet. Start writing.</p>
+          </div>
+        </div>
+      </section>
+      <!-- === BREATHE PAGE === -->
+      <section class="page" id="page-breathe">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Ground Yourself</p>
+            <h1 class="page-title">Breathe</h1>
+          </div>
+        </header>
+        <div class="breathe-center">
+          <div class="breathe-orb-wrap">
+            <div class="breathe-orb" id="breathe-orb">
+              <span class="breathe-instruction" id="breathe-instruction">Press Start</span>
+            </div>
+            <div class="breathe-rings">
+              <div class="breathe-ring r1"></div>
+              <div class="breathe-ring r2"></div>
+              <div class="breathe-ring r3"></div>
+            </div>
+          </div>
+          <div class="breathe-controls">
+            <select class="breathe-select" id="breathe-pattern">
+              <option value="4-4-4-4">Box Breathing (4-4-4-4)</option>
+              <option value="4-7-8">4-7-8 Relaxing</option>
+              <option value="5-5">5-5 Calm</option>
+            </select>
+            <button class="btn-primary" id="breathe-btn">Start Session</button>
+          </div>
+          <p class="breathe-cycle" id="breathe-cycle"></p>
+        </div>
+      </section>
+      <!-- === SETTINGS PAGE === -->
+      <section class="page" id="page-settings">
+        <header class="page-header">
+          <div>
+            <p class="page-eyebrow">Customize</p>
+            <h1 class="page-title">Settings</h1>
+          </div>
+        </header>
+        <div class="settings-grid">
+          <div class="card settings-card">
+            <h3 class="card-title">Sobriety Start Date</h3>
+            <input type="datetime-local" class="settings-input" id="start-date-input"/>
+            <button class="btn-primary" id="save-start-date">Save Date</button>
+          </div>
+          <div class="card settings-card">
+            <h3 class="card-title">Weekly Spending (before)</h3>
+            <div class="input-row">
+              <span class="currency-sign">Kes. </span>
+              <input type="number" class="settings-input inline" id="weeklySpend" placeholder="0.00" min="0" step="0.01"/>
+            </div>
+            <button class="btn-primary" id="save-weekly-spend">Save</button>
+          </div>
+          <div class="card settings-card">
+            <h3 class="card-title">Your Name</h3>
+            <input type="text" class="settings-input" id="user-name" placeholder="What should we call you?"/>
+            <button class="btn-primary" id="save-name">Save</button>
+          </div>
+          <div class="card settings-card danger-zone">
+            <h3 class="card-title">Reset Counter</h3>
+            <p class="card-sub">This will reset your sobriety clock. Relapses happen — you can start again.</p>
+            <button class="btn-danger" id="reset-btn">Reset & Restart</button>
+          </div>
+          <div class="card settings-card">
+            <h3 class="card-title">Sobriety History</h3>
+            <p class="card-sub">All your past periods — your journey, preserved.</p>
+            <div id="sobriety-history-list"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <!-- Urge Modal -->
+  <div class="modal-overlay" id="urge-modal" style="display:none;">
+    <div class="modal">
+      <h2 class="modal-title">Ride the Wave 🌊</h2>
+      <p class="modal-body">Urges peak and pass — usually within 15–30 minutes. You don't have to act on this feeling. Just breathe and observe.</p>
+      <div class="urge-timer-display">
+        <span id="urge-countdown">15:00</span>
+        <span class="urge-timer-label">minutes remaining</span>
+      </div>
+      <div class="urge-progress-bar"><div class="urge-progress-fill" id="urge-fill"></div></div>
+      <button class="btn-primary" id="close-urge-modal">I Surfed It ✓</button>
+    </div>
+  </div>
+
+  <!-- Django API config (adjust URL name to match your urls.py) -->
+  <script>
+    window.JOURNAL_API_URL = "{% url 'core:journal_api' %}";
+    window.PROFILE_API_URL = "{% url 'accounts:profile_api' %}";
+    window.PERIODS_API_URL = "{% url 'core:sobriety_periods_api' %}";
+  </script>
+
+  <script src="{% static 'index.js' %}"></script>
+</body>
+</html>

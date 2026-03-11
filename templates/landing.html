@@ -1,0 +1,125 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ancora — Welcome</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'landing.css'  %}"/>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Grain overlay -->
+  <div class="grain"></div>
+
+  <!-- ===================== -->
+  <!-- INTRO SEQUENCE        -->
+  <!-- ===================== -->
+  <div class="sequence" id="sequence">
+
+    <!-- Message 1 -->
+    <div class="message-frame" id="msg-1">
+      <p class="msg-line small">You are not alone.</p>
+    </div>
+
+    <!-- Message 2 -->
+    <div class="message-frame" id="msg-2">
+      <p class="msg-line">Every journey<br/><em>begins with one step.</em></p>
+    </div>
+
+    <!-- Message 3 -->
+    <div class="message-frame" id="msg-3">
+      <p class="msg-line small">That step is today.</p>
+    </div>
+
+    <!-- Message 4 -->
+    <div class="message-frame" id="msg-4">
+      <p class="msg-line">You are<br/><em>braver than you know.</em></p>
+    </div>
+
+    <!-- Message 5 -->
+    <div class="message-frame" id="msg-5">
+      <p class="msg-line small">Healing is not linear.</p>
+      <p class="msg-line small accent">But it is real.</p>
+    </div>
+
+    <!-- Message 6 -->
+    <div class="message-frame" id="msg-6">
+      <p class="msg-line">The hardest part<br/><em>is deciding to begin.</em></p>
+    </div>
+
+    <!-- Message 7 — final CTA -->
+    <div class="message-frame final-frame" id="msg-7">
+
+      <div class="final-brand">
+        <span class="final-anchor">⚓</span>
+        <span class="final-name">Ancora</span>
+      </div>
+
+      <h1 class="final-heading">
+        Your anchor.<br/>
+        <em>Your beginning.</em>
+      </h1>
+
+      <p class="final-body">
+        A quiet space to track your sobriety,<br/>
+        celebrate your strength, and find your ground.
+      </p>
+
+      <div class="final-actions">
+        <a href="{% url 'accounts:signup' %}" class="btn-start">
+          <span>Begin My Journey</span>
+          <span class="btn-arrow">→</span>
+        </a>
+        <a href="{% url 'accounts:login' %}" class="btn-signin">
+          Already started? Sign in
+        </a>
+      </div>
+
+      <div class="final-proof">
+        <div class="proof-item">
+          <span class="proof-num">3.2K+</span>
+          <span class="proof-label">Members</span>
+        </div>
+        <div class="proof-dot"></div>
+        <div class="proof-item">
+          <span class="proof-num">47K+</span>
+          <span class="proof-label">Days logged</span>
+        </div>
+        <div class="proof-dot"></div>
+        <div class="proof-item">
+          <span class="proof-num">Free</span>
+          <span class="proof-label">Always</span>
+        </div>
+      </div>
+
+      <button class="skip-btn" id="auto-redirect-btn">
+        Redirecting to login in <span id="countdown-num">8</span>s &nbsp;·&nbsp; Skip now →
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- Progress dots -->
+  <div class="progress-dots" id="progress-dots">
+    <div class="pdot active" data-step="0"></div>
+    <div class="pdot" data-step="1"></div>
+    <div class="pdot" data-step="2"></div>
+    <div class="pdot" data-step="3"></div>
+    <div class="pdot" data-step="4"></div>
+    <div class="pdot" data-step="5"></div>
+    <div class="pdot active-final" data-step="6"></div>
+  </div>
+
+  <!-- Skip early link -->
+  <a href="{% url 'accounts:login' %}" class="skip-early" id="skip-early">Skip →</a>
+
+  <script src="{% static 'landing.js'%}"></script>
+</body>
+</html>
