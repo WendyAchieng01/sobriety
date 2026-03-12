@@ -150,3 +150,7 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://sobriety-production.up.railway.app",
+]
